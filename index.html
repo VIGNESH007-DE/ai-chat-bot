@@ -1,0 +1,52 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatBot</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 30px; }
+    #chatbox { background: white; padding: 20px; max-width: 600px; margin: auto; border-radius: 10px; }
+    .message { margin: 10px 0; }
+    .user { color: blue; font-weight: bold; }
+    .bot { color: green; }
+    input, button { padding: 10px; font-size: 16px; margin-top: 10px; width: calc(100% - 22px); }
+    button { width: 100%; margin-top: 10px; background-color: #007bff; color: white; border: none; }
+  </style>
+</head>
+<body>
+  <div id="chatbox">
+    <div id="messages"></div>
+    <input type="text" id="input" placeholder="Ask something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('input');
+      const message = input.value;
+      if (!message.trim()) return;
+
+      addMessage('You', message, 'user');
+      input.value = '';
+
+      const response = await fetch('http://localhost:5000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+      addMessage('Bot', data.reply, 'bot');
+    }
+
+    function addMessage(sender, text, cls) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${cls}`;
+      msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      document.getElementById('messages').appendChild(msgDiv);
+    }
+  </script>
+</body>
+</html>
